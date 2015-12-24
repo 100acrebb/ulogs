@@ -92,6 +92,8 @@ ULogs.config.IgnoreCommands = {                        -- Don't log these consol
 "ans",
 "cs_askholders",
 "cs_menu",
+"E2_FinishChat",
+"E2_StartChat",
 
 ULogs.config.ConCommand -- Don't log the command to open the logs menu. Please don't edit this line
 
