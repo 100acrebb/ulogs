@@ -17,6 +17,7 @@
 
 
 ULogs = ULogs or {}
+ULogs.Version = "1.04"
 
 util.AddNetworkString( "ULogs_OpenMenu" )
 util.AddNetworkString( "ULogs_Notify" )
@@ -352,6 +353,7 @@ ULogs.OpenMenu = function( Player )
 	
 	net.Start( "ULogs_OpenMenu" )
 		net.WriteBool( ULogs.CanDelete( Player ) )
+		net.WriteString( ULogs.Version or "1" )
 	net.Send( Player )
 	
 end
