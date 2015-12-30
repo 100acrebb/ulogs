@@ -111,7 +111,6 @@ local string = string
 local table = table
 local timer = timer
 local tostring = tostring
-local GAMEMODE = GM or GAMEMODE
 local mysqlOO
 local TMySQL
 local _G = _G
@@ -157,8 +156,8 @@ function initialize(config)
         end)
     else
         timer.Simple(0, function()
-            GAMEMODE.DatabaseInitialized = GAMEMODE.DatabaseInitialized or function() end
-            hook.Call("DatabaseInitialized", GAMEMODE)
+            --GAMEMODE.DatabaseInitialized = GAMEMODE.DatabaseInitialized or function() end
+            hook.Call("DatabaseInitialized")
         end)
     end
 end
