@@ -17,6 +17,7 @@
 
 
 ULogs = ULogs or {}
+ULogs.Version = "1.04"
 
 util.AddNetworkString( "ULogs_OpenMenu" )
 util.AddNetworkString( "ULogs_Notify" )
@@ -37,30 +38,22 @@ util.AddNetworkString( "ULogs_DeleteOldest" )
 
 
 
+ULogs.Initialize = function()
+	MySQLite.initialize( ULogs.MySQLite_config )
+	--ULogs.MySQLite_config = nil -- Because it will never be used after here
+end
+ULogs.Initialize()
+
+ULogs.QueryError = function( String, Query )
+	error("[ULogs] Query error : " .. String .. " on query : '" .. Query .. "'")
+end
+
 ULogs.Query = function( Query, CallBack ) -- Query function
 	
 	if !Query then return end
-	local Error = sql.LastError()
-	local Result = sql.Query( Query )
+	if type(Query) != "string" then return end
 	
-	if sql.LastError() and sql.LastError() != Error then
-		
-		Error = sql.LastError()
-		error( Error .. " ( " .. Query .. " ) " )
-		
-		return
-		
-	end
-	
-	if type( CallBack ) == "function" then CallBack( Result ) end
-	
-	return Result
-	
-end
-
-ULogs.SQLStr = function( Str )
-	
-	return sql.SQLStr( Str )
+	MySQLite.query(Query, CallBack, ULogs.QueryError)
 	
 end
 
@@ -70,7 +63,7 @@ ULogs.GetDate = function()
 	
 end
 
-ULogs.IsIP = function( Str )
+ULogs.IsIP = function( Str ) -- Bad function for the moment to check if a string contains a ip
 	
 	if !Str then return end
 	Str = Str:lower()
@@ -220,8 +213,8 @@ ULogs.AddLog = function( Category, Message, Informations, Date )
 	ULogs.CheckLimit( function()
 		
 		ULogs.Query( "INSERT INTO " .. ULogs.config.TableName .. " (date, category, message, informations) VALUES("
-			.. ULogs.SQLStr( Date ) .. ", " .. ULogs.SQLStr( Category ) .. ", "
-			.. ULogs.SQLStr( Message ) .. ", " .. ULogs.SQLStr( Informations ) .. ")" )
+			.. MySQLite.SQLStr( Date ) .. ", " .. MySQLite.SQLStr( Category ) .. ", "
+			.. MySQLite.SQLStr( Message ) .. ", " .. MySQLite.SQLStr( Informations ) .. ")" )
 	end)
 	
 	if ULogs.config.SaveToData then
@@ -259,7 +252,7 @@ end
 
 
 
-ULogs.Notify = function( Player, Str )
+ULogs.Notify = function( Player, Str ) -- Because I don't want to use MetaTable
 	
 	if !Player or !Player:IsValid() or !Player:IsPlayer() then return end
 	if !Str then return end
@@ -360,6 +353,7 @@ ULogs.OpenMenu = function( Player )
 	
 	net.Start( "ULogs_OpenMenu" )
 		net.WriteBool( ULogs.CanDelete( Player ) )
+		net.WriteString( ULogs.Version or "1" )
 	net.Send( Player )
 	
 end
@@ -391,12 +385,14 @@ end
 
 
 
-hook.Add( "PreGamemodeLoaded", "ULogs_PreGamemodeLoaded", function() -- Create table if not exists
+hook.Add( "DatabaseInitialized", "ULogs_DatabaseInitialized", function()
+	
+	local AUTOINCREMENT = MySQLite.isMySQL() and "AUTO_INCREMENT" or "AUTOINCREMENT" -- Thanks FPtje
 	
 	ULogs.Query( [[
 		
 		CREATE TABLE IF NOT EXISTS ]] .. ULogs.config.TableName .. [[(
-			id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+			id INTEGER NOT NULL PRIMARY KEY ]] .. AUTOINCREMENT .. [[,
 			date TEXT NOT NULL,
 			category VARCHAR(10) NOT NULL,
 			message TEXT NOT NULL,
@@ -462,18 +458,18 @@ net.Receive( "ULogs_Request", function( _, Player )
 		
 		local CategorySearch = " AND category = " .. Category
 		if Category == 1 then CategorySearch = "" end
-		Query = "SELECT * FROM " .. ULogs.config.TableName .. " WHERE date LIKE " .. ULogs.SQLStr( "%" .. Option .. "%" ) .. " OR message LIKE "
-			.. ULogs.SQLStr( "%" .. Option .. "%" ) .. CategorySearch .. " ORDER BY id DESC LIMIT " .. Offset .. ", " .. Lines
-		QueryCount = "SELECT COUNT(*) AS id FROM " .. ULogs.config.TableName .. " WHERE date LIKE " .. ULogs.SQLStr( "%" .. Option .. "%" )
-			.. " OR message LIKE " .. ULogs.SQLStr( "%" .. Option .. "%" ) .. CategorySearch
+		Query = "SELECT * FROM " .. ULogs.config.TableName .. " WHERE date LIKE " .. MySQLite.SQLStr( "%" .. Option .. "%" ) .. " OR message LIKE "
+			.. MySQLite.SQLStr( "%" .. Option .. "%" ) .. CategorySearch .. " ORDER BY id DESC LIMIT " .. Offset .. ", " .. Lines
+		QueryCount = "SELECT COUNT(*) AS id FROM " .. ULogs.config.TableName .. " WHERE date LIKE " .. MySQLite.SQLStr( "%" .. Option .. "%" )
+			.. " OR message LIKE " .. MySQLite.SQLStr( "%" .. Option .. "%" ) .. CategorySearch
 		
 	elseif Mode == 3 then
 		
 		local CategorySearch = " AND category = " .. Category
 		if Category == 1 then CategorySearch = "" end
-		Query = "SELECT * FROM " .. ULogs.config.TableName .. " WHERE informations LIKE " .. ULogs.SQLStr( "%" .. Option .. "%" ) .. CategorySearch
+		Query = "SELECT * FROM " .. ULogs.config.TableName .. " WHERE informations LIKE " .. MySQLite.SQLStr( "%" .. Option .. "%" ) .. CategorySearch
 			.. " ORDER BY id DESC LIMIT " .. Offset .. ", " .. Lines
-		QueryCount = "SELECT COUNT(*) AS id FROM " .. ULogs.config.TableName .. " WHERE informations LIKE " .. ULogs.SQLStr( "%" .. Option .. "%" )
+		QueryCount = "SELECT COUNT(*) AS id FROM " .. ULogs.config.TableName .. " WHERE informations LIKE " .. MySQLite.SQLStr( "%" .. Option .. "%" )
 			.. CategorySearch
 		
 	end
@@ -545,7 +541,7 @@ net.Receive( "ULogs_Delete", function( _, Player )
 	
 	if !ULogs.LogTypes[ Category ] then return end
 	
-	local Query = " WHERE category = " .. ULogs.SQLStr( Category )
+	local Query = " WHERE category = " .. MySQLite.SQLStr( Category )
 	
 	if Category <= 1 then
 		

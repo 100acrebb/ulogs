@@ -20,6 +20,7 @@ ULogs.AddGMType( 1, "Sandbox" )
 ULogs.AddGMType( 2, "DarkRP" )
 ULogs.AddGMType( 3, "TTT" )
 ULogs.AddGMType( 4, "Murder" )
+ULogs.AddGMType( 5, "Admin" )
 
 
 

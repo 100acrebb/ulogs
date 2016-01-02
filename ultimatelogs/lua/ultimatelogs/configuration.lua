@@ -94,6 +94,19 @@ ULogs.config.IgnoreCommands = {                        -- Don't log these consol
 "cs_menu",
 "E2_FinishChat",
 "E2_StartChat",
+"wire_expression2_friend_status",
+"fas2_attach",
+"wac_setseat",
+"SetMechPlayerWepKey",
+"wire_expression2_event",
+"vc_els_manual",
+"vc_horn",
+"vc_els_lights",
+"vc_els_sound",
+"vc_headlights_onoff",
+"vc_lights_onoff",
+"wire_pod_bind",
+
 
 ULogs.config.ConCommand -- Don't log the command to open the logs menu. Please don't edit this line
 
@@ -110,7 +123,7 @@ ULogs.config.Limit          = 3200                     -- Set the logs lines lim
 													   -- (See the settings below)
 
 
-ULogs.config.Block = {                                 -- Uncomment these lines if you want to block a log from being recorded
+ULogs.config.Block = {                                 -- Don't touch this if you don't know what it does please. Uncomment these lines if you want to block a log from being recorded
                                                        -- You can find the log ID in the 'logtypes/' folder
 
 -- 2,

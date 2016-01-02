@@ -25,6 +25,7 @@ surface.CreateFont( "ULogs_Page",
 	{ font = "Arial", size = 16 } )
 
 ULogs.Block = {}
+ULogs.VersionAdvert = true
 
 
 
@@ -100,6 +101,28 @@ ULogs.FindPlayer = function( Name )
 	
 end
 
+ULogs.CheckUpdate = function( CurrentVersion )
+	
+	timer.Simple(.5, function()
+		
+		http.Fetch( "https://raw.githubusercontent.com/myrage2000/ulogs/master/VERSION", function( Body )
+			
+			Version = tonumber( Body )
+			
+			if Version != CurrentVersion and ULogs.VersionAdvert then
+				
+				ULogs_Delete_Derma_Query( "A new update is available", "ULogs update", "Remind me next at my next connection", function() ULogs.VersionAdvert = false end, "Ok", function() end, 
+					"Download page", function() gui.OpenURL( "https://facepunch.com/showthread.php?t=1498803" ) end )
+				
+			end
+			
+			
+		end)
+		
+	end)
+	
+end
+
 
 
 
@@ -123,7 +146,9 @@ end)
 net.Receive( "ULogs_OpenMenu", function()
 	
 	local Delete = tobool( net.ReadBit() )
+	local CurrentVersion = tonumber( net.ReadString( "1" ) )
 	
+	ULogs.CheckUpdate( CurrentVersion )
 	ULogs.OpenMenu( Delete )
 	
 end)
@@ -393,7 +418,7 @@ ULogs.OpenMenu = function( Delete )
 	
 	local CategoryTitle = vgui.Create( "DLabel", Main )
 	CategoryTitle:SetColor( Color( 255, 255, 255, 255 ) )
-	CategoryTitle:SetFont( "ERPLogs_Title" )
+	CategoryTitle:SetFont( "Default" )
 	CategoryTitle:SetPos( 160, 35 )
 	CategoryTitle.Think = function()
 		if ULogs.RefreshCategory then
@@ -617,21 +642,9 @@ ULogs.OpenMenu = function( Delete )
 	List:AddItem( Button )
 	
 	local Button = vgui.Create( "ULogs_DButton" )
-	Button:SetText( "Debug" )
+	Button:SetText( "Forum" )
 	Button.DoClick = function()
-		ULogs.GetOptions()
-		chat.AddText( Color( 255, 100, 0 ), "[" .. ULogs.config.Title .. "] ", Color( 255, 0, 0 ), "----- Debug -----" )
-		chat.AddText( Color( 255, 100, 0 ), "[" .. ULogs.config.Title .. "] ", Color( 255, 255, 255 ), "Table : '" .. ULogs.config.TableName .. "'" )
-		chat.AddText( Color( 255, 100, 0 ), "[" .. ULogs.config.Title .. "] ", Color( 255, 255, 255 ), "Lines/Pages : '" .. ULogs.config.Lines .. "'" )
-		chat.AddText( Color( 255, 100, 0 ), "[" .. ULogs.config.Title .. "] ", Color( 255, 255, 255 ), "TimeOut : '" .. ULogs.config.MaxLoadTime .. "'" )		
-		chat.AddText( Color( 255, 100, 0 ), "[" .. ULogs.config.Title .. "] ", Color( 255, 255, 255 ), "Limit : '" .. ULogs.config.Limit .. "'" )
-		chat.AddText( Color( 255, 100, 0 ), "[" .. ULogs.config.Title .. "] ", Color( 255, 255, 255 ), "CBlock : " )
-		for k, v in pairs( ULogs.Block ) do
-			if v then
-				chat.AddText( Color( 255, 100, 0 ), "[" .. ULogs.config.Title .. "] ", Color( 255, 255, 255 ), "     - '" .. ULogs.LogTypes[ k ].Name .. "'" )
-			end
-		end
-		chat.AddText( Color( 255, 100, 0 ), "[" .. ULogs.config.Title .. "] ", Color( 255, 0, 0 ), "---------------" )
+		gui.OpenURL( "https://facepunch.com/showthread.php?t=1498803" )
 	end
 	List:AddItem( Button )
 	

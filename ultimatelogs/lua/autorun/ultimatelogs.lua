@@ -26,11 +26,11 @@ if SERVER then
 	
 	
 	AddCSLuaFile( "ultimatelogs/configuration.lua" )
-	for k, v in pairs( file.Find( "ultimatelogs/server/*.lua", "LUA" ) ) do
-		
-		include( "ultimatelogs/server/" .. v )
-		
-	end
+	
+	include( "ultimatelogs/configurationMySQL.lua" )
+	include( "ultimatelogs/server/mysqlite.lua" )
+	include( "ultimatelogs/server/sv_ultimatelogs.lua" )
+	
 	for k, v in pairs( file.Find( "ultimatelogs/client/*.lua", "LUA" ) ) do
 		
 		AddCSLuaFile( "ultimatelogs/client/" .. v )
