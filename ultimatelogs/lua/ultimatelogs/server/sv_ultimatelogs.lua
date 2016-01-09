@@ -173,11 +173,15 @@ ULogs.CheckLimit = function( CallBack )
 			
 			if lines > ULogs.config.Limit then
 				
-				ULogs.Query( "DELETE FROM " .. ULogs.config.TableName .. " WHERE id IN( SELECT id FROM " .. ULogs.config.TableName .. " ORDER BY id ASC LIMIT 1)", function()
-					
+				
+				--ULogs.Query( "DELETE FROM " .. ULogs.config.TableName .. " ORDER BY id ASC LIMIT 100", function()
+				--	CallBack()
+				--	return
+				--end)
+				
+				ULogs.Query( "DELETE FROM " .. ULogs.config.TableName .. " WHERE id IN( SELECT id FROM " .. ULogs.config.TableName .. " ORDER BY id ASC LIMIT 10)", function()
 					CallBack()
 					return
-					
 				end)
 				
 			else
@@ -565,10 +569,13 @@ net.Receive( "ULogs_DeleteOldest", function( _, Player )
 	
 	local Number = math.floor( tonumber( net.ReadString() ) )
 	
+
+	--ULogs.Query( "DELETE FROM " .. ULogs.config.TableName .. " ORDER BY id ASC LIMIT " .. Number , function()
+	--	ULogs.Notify( Player, "Successfully deleted logs !" )
+	--end)
+	
 	ULogs.Query( "DELETE FROM " .. ULogs.config.TableName .. " WHERE id IN( SELECT id FROM " .. ULogs.config.TableName .. " ORDER BY id ASC LIMIT " .. Number .. ")", function()
-		
 		ULogs.Notify( Player, "Successfully deleted logs !" )
-		
 	end)
 	
 end)

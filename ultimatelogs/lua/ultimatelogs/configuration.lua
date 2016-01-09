@@ -23,7 +23,8 @@ ULogs.config = {}                                      -- Please don't edit this
 
 ULogs.config.Title          = "Ultimate Logs"          -- The addon name
 
-ULogs.config.TableName      = "ulogs"                  -- The database table name
+if (THABID == nil) then THABID = "unknown" end
+ULogs.config.TableName      = "ulogs_" .. THABID                 -- The database table name
 
 ULogs.config.Lines          = 32                       -- Set how many lines are visible per page
 
@@ -37,20 +38,27 @@ ULogs.config.MaxLoadTime    = 5                        -- After how many seconds
 ULogs.config.CanSee         = {                        -- ULX ranks that can open the logs menu
 
 "superadmin",
+"headadmin",
+"senioradmin",
 "admin",
-
+"operator",
+"moderator",
 }
 
 ULogs.config.SeeIP          = {                        -- ULX ranks that can see IP addresses
 
 "superadmin",
+"headadmin",
+"senioradmin",
+"admin",
+
 
 }
 
 ULogs.config.Delete         = {                        -- ULX ranks that can delete logs
 
 "superadmin",
-
+"headadmin",
 }
 
 ULogs.config.IgnoreCommands = {                        -- Don't log these console commands
@@ -106,6 +114,9 @@ ULogs.config.IgnoreCommands = {                        -- Don't log these consol
 "vc_headlights_onoff",
 "vc_lights_onoff",
 "wire_pod_bind",
+"billiard_strike",
+"wac_air_input",
+"slotm_spin",
 
 
 ULogs.config.ConCommand -- Don't log the command to open the logs menu. Please don't edit this line
@@ -115,7 +126,7 @@ ULogs.config.ConCommand -- Don't log the command to open the logs menu. Please d
 ULogs.config.LogChatCommand = false                    -- Set to 'true' if you want to log the chat command to open the logs menu
 
 
-ULogs.config.Limit          = 3200                     -- Set the logs lines limit in the database
+ULogs.config.Limit          = 5000                     -- Set the logs lines limit in the database
                                                        -- This is very important if you want to keep your server stable
 													   -- If the limit is reached, the oldest lines will be
 													   -- deleted.
@@ -150,7 +161,7 @@ ULogs.config.Block = {                                 -- Don't touch this if yo
 
 }
 
-ULogs.config.SaveToData      = true                    -- Set to 'true' if you want to save a copy of the logs in the data folder
+ULogs.config.SaveToData      = false                    -- Set to 'true' if you want to save a copy of the logs in the data folder
                                                        -- In all cases the logs will be at least saved in the database
 
 
@@ -181,7 +192,7 @@ ULogs.config.SeeIPCustom    = function( Player )         -- If ULX is not instal
                                                          -- is set to 'true' then call this function to
 														 -- check if a player can see IP addresses
 
-return Player:IsSuperAdmin()                             -- By default only superadmins can open see
+return Player:IsSuperAdmin() or Player:IsAdmin()                             -- By default only superadmins can open see
 	                                                     -- IP addresses
 
 end
