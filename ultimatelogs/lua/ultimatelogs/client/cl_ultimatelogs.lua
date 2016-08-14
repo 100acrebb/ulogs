@@ -25,7 +25,7 @@ surface.CreateFont( "ULogs_Page",
 	{ font = "Arial", size = 16 } )
 
 ULogs.Block = {}
-ULogs.VersionAdvert = true
+ULogs.VersionAdvert = false
 
 
 
@@ -42,9 +42,11 @@ ULogs.VersionAdvert = true
 ULogs.GetOptions = function()
 	
 	local Data = LocalPlayer():GetPData( "ulogs_block", "[]" ) -- I don't like convars
-	
-	ULogs.Block = util.JSONToTable( Data )
-	ULogs.Block[ 1 ] = false
+
+	if (type(Data) == "string") then
+		ULogs.Block = util.JSONToTable( Data )
+		ULogs.Block[ 1 ] = false
+	end
 	
 end
 
